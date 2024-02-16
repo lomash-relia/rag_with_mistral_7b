@@ -5,3 +5,9 @@ ctransformers == 0.2.27
 beautifulsoup4 == 4.12.3
 duckduckgo_search == 4.4
 faiss-cpu == 1.7.4
+sentence-transformers
+streamlit
+chromadb
+pypdf
+huggingface_hub
+python-dotenv

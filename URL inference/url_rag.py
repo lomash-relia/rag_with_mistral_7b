@@ -27,7 +27,7 @@ def initialize_embeddings():
 def load_docs(url):
     loader = WebBaseLoader(url,requests_per_second=1)
     docs = loader.load()
-    splitter= RecursiveCharacterTextSplitter(chunk_size = 50,chunk_overlap = 5)
+    splitter= RecursiveCharacterTextSplitter(chunk_size = 20,chunk_overlap = 5)
     docs = splitter.split_documents(docs)
     return docs
  
@@ -35,13 +35,19 @@ def load_docs(url):
 def create_db(url):
     embedding = initialize_embeddings()
     docs = load_docs(url)
+    print(f"docs length: {len(docs)}")
     vectoreStore = FAISS.from_documents(docs,embedding=embedding)
+    print(vectoreStore)
     return vectoreStore
 
 def create_chain(vectoreStore: FAISS):
-    # Model
-    llm = CTransformers(model="D:\Langchain\mistral-7b-instruct-v0.1.Q4_K_M.gguf",
-                        model_type="mistral")
+    config={'context_length':1024,
+            'temperature':0.02}
+    model=r"LLM model\mistral-7b-instruct-v0.1.Q5_K_M.gguf"
+    llm = CTransformers(model=model,
+                        model_type="mistral",
+                        config=config)
+    print(llm)
 
     # response = llm.batch(["Hello how are you?","Write a poem on Cosmos"])
 
@@ -57,7 +63,7 @@ def create_chain(vectoreStore: FAISS):
     #                                         """)
 
     prompt = ChatPromptTemplate.from_messages([
-        ("system","Be precise. Answer the user's questions based on the context: {context}"),
+        ("system","You are 'caption for social media' generating AI assistant.Generate caption based on following {context}."),
         MessagesPlaceholder(variable_name="chat_history"),
         ("human","{input}")
     ])
@@ -70,7 +76,7 @@ def create_chain(vectoreStore: FAISS):
         llm=llm,
         prompt=prompt,
     )
-    retriever = vectoreStore.as_retriever(search_kwargs={"k":2})
+    retriever = vectoreStore.as_retriever(search_kwargs={"k":3})
     retrieval_chain = create_retrieval_chain(retriever,
                                    chain)
     return retrieval_chain
@@ -83,20 +89,20 @@ def process_chat(chain, question, chat_history):
     return response
     
 if __name__ == "__main__":
-    url = "https://machinelearningmastery.com/start-here/#code_algorithms"
+    # url = "https://machinelearningmastery.com/start-here/#code_algorithms"
+    url = "https://napoleoncat.com/blog/instagram-captions/"
     vectoreStore = create_db(url)
     chain = create_chain(vectoreStore)
     
     chat_history = []
     
-    
     while True:
         user_input = input("You: ")
         if user_input.lower() == 'exit':
             break
-        response = process_chat(chain, user_input,chat_history)
         
-        chat_history.append(HumanMessage(content=user_input))
-        chat_history.append(AIMessage(content=str(response)))
+        response = process_chat(chain, user_input,chat_history)
+        # chat_history.append(HumanMessage(content=user_input))
+        # chat_history.append(AIMessage(content=str(response)))
         
         print(response['answer'])
