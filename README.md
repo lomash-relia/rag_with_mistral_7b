@@ -10,6 +10,7 @@ This code sets up an interactive chat system:
 - For PDF RAG system, streamlit for UI is also used. For website data RAG, cli is used as the interface.
 
 To simply run the PDFs RAG project:
+- Download supported gguf model from HuggingFace. Place the model file in the folder.
 - Install packages in your activated environment
 ```
 pip install -r requirement.txt
