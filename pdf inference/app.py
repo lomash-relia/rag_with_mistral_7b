@@ -41,7 +41,8 @@ retriever = load_vector_store.as_retriever(search_kwargs={"k":4})
 #                           'temperature':0.01,
 #                           'context_length':1024})
 
-model = r"LLM model\mistral-7b-instruct-v0.1.Q5_K_M.gguf"
+# model = r"LLM model\mistral-7b-instruct-v0.1.Q5_K_M.gguf"
+model = r"D:\Langchain\rag_with_mistral_7b\LLM model\gemma-2b-it.gguf"
 llm = LlamaCpp(model_path=model,
                temperature=0.1,
                max_tokens=2000,
